@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ueransim-ue
+  namespace: open5gs
+  labels:
+    app: ueransim-ue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ueransim-ue
+  template:
+    metadata:
+      labels:
+        app: ueransim-ue
+    spec:
+      containers:
+      - name: ue
+        image: ueransim:local
+        imagePullPolicy: Never
+        command: ["/ueransim/build/nr-ue"]
+        args: ["-c", "/etc/ueransim/ue.yaml"]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/ueransim
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_MODULE
+      volumes:
+      - name: config
+        configMap:
+          name: ueransim-ue-config

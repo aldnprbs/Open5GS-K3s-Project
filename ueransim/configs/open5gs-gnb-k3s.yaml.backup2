@@ -1,0 +1,15 @@
+mcc: '001'
+mnc: '01'
+nci: '0x000000010'
+idLength: 32
+tac: 1
+linkIp: 192.168.100.141
+ngapIp: 192.168.100.141
+gtpIp: 192.168.100.141
+gtpAdvertiseIp: 192.168.100.141
+ignoreStreamIds: true
+amfConfigs:
+  - address: 192.168.100.141
+    port: 38412
+slices:
+  - sst: 1
