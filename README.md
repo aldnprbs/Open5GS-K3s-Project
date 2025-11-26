@@ -205,33 +205,24 @@ Bagian berikut **disiapkan kosong** agar kamu bisa menaruh **SS Terminal 1, 2, d
 
 ## 📌 Terminal 1 — gNB (nr-gnb)
 
-> Letakkan screenshot/log eksekusi **gNB** di sini
-
-```
-[ Tempat memasukkan output / screenshot Terminal 1 ]
-```
+![Terminal 1 — gNB](assets/terminal1-gnb.png)
 
 ---
 
 ## 📌 Terminal 2 — UE (nr-ue)
 
-> Letakkan screenshot/log eksekusi **UE** di sini
-
-```
-[ Tempat memasukkan output / screenshot Terminal 2 ]
-```
+![Terminal 2 — UE](assets/terminal2-ue.png)
 
 ---
 
 ## 📌 Terminal 3 — Monitoring / K3s / Logs Tambahan
 
-> Letakkan screenshot/log seperti `kubectl get pods`, `kubectl logs amf-0`, atau log UPF/NRF dsb.
+![Terminal 3 — Monitoring 1](assets/terminal3-monitoring-1.png)
 
-```
-[ Tempat memasukkan output / screenshot Terminal 3 ]
-```
+![Terminal 3 — Monitoring 2](assets/terminal3-monitoring-2.png)
 
----
+![Terminal 3 — Monitoring 3](assets/terminal3-monitoring-3.png)
+
 
 ## 📊 Performance Characteristics
 
