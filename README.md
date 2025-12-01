@@ -322,6 +322,327 @@ sudo ./build/nr-ue -c configs/open5gs-ue-embb.yaml
 
 ---
 
+## 🧪 Detailed Test Results
+
+### Test Execution Summary
+- **Test Date**: 1 Desember 2025, 11:35 WIB
+- **Total Tests**: 12
+- **Passed**: 12 ✅
+- **Failed**: 0 ❌
+- **Success Rate**: **100%**
+
+### Infrastructure Tests
+
+#### Test 1.1: K3s Cluster Status
+```bash
+kubectl get nodes
+```
+**Result**: ✅ **PASS** - Node status "Ready" (v1.33.6+k3s1)
+
+#### Test 1.2: Calico CNI Status
+```bash
+kubectl get pods -n kube-system | grep calico
+```
+**Result**: ✅ **PASS** - calico-node and calico-kube-controllers running
+
+#### Test 1.3: Open5GS Namespace
+```bash
+kubectl get namespace open5gs
+```
+**Result**: ✅ **PASS** - Namespace "open5gs" active
+
+### Network Functions Tests
+
+#### Test 2.1: All Pods Running
+```bash
+kubectl get pods -n open5gs
+```
+**Result**: ✅ **PASS** - 10 pods in "Running" status, 0 restarts
+
+#### Test 2.2: Static IP Assignment
+**Result**: ✅ **PASS** - All pods have correct static IPs from 10.10.0.0/24
+
+#### Test 2.3: MongoDB Connectivity
+**Result**: ✅ **PASS** - UDR and PCF successfully connected to MongoDB
+
+### UERANSIM Tests
+
+#### Test 3.1: gNB Registration
+```bash
+./build/nr-gnb -c configs/open5gs-gnb-k3s.yaml
+```
+**Result**: ✅ **PASS** - "NG Setup procedure is successful"
+
+#### Test 3.2: UE Registration
+```bash
+sudo ./build/nr-ue -c configs/open5gs-ue-embb.yaml
+```
+**Result**: ✅ **PASS** - "MM-REGISTERED/NORMAL-SERVICE"
+
+#### Test 3.3: PDU Session Establishment
+**Result**: ✅ **PASS** - TUN interface `uesimtun0` up with IP `10.45.0.6/24`
+
+### Connectivity Tests
+
+#### Test 4.1: TUN Interface Status
+```bash
+ip addr show uesimtun0
+```
+**Result**: ✅ **PASS** - Interface up with IP 10.45.0.6/24
+
+#### Test 4.2: Gateway Connectivity (UE → UPF)
+```bash
+ping -I uesimtun0 -c 4 10.45.0.1
+```
+**Result**: ✅ **PASS** - 0% packet loss, RTT avg 25.911ms
+
+#### Test 4.3: Internet Connectivity
+```bash
+ping -I uesimtun0 -c 4 8.8.8.8
+```
+**Result**: ✅ **PASS** - 0% packet loss, RTT avg 48.508ms
+
+#### Test 4.4: DNS Resolution
+```bash
+nslookup google.com 8.8.8.8
+```
+**Result**: ✅ **PASS** - Successfully resolved to multiple IPv4 and IPv6 addresses
+
+#### Test 4.5: Traceroute
+```bash
+sudo traceroute -i uesimtun0 -m 5 8.8.8.8
+```
+**Result**: ✅ **PASS** - Valid routing path: UE → UPF → Gateway → Internet
+
+#### Test 4.6: HTTP Download
+```bash
+sudo wget --bind-address=10.45.0.6 -O /dev/null http://www.google.com
+```
+**Result**: ✅ **PASS** - Download speed: 416 KB/s (3.33 Mbps)
+
+### Performance Metrics
+
+| Destination | Min RTT | Avg RTT | Max RTT | Packet Loss |
+|-------------|---------|---------|---------|-------------|
+| UPF Gateway (10.45.0.1) | 4.11 ms | 25.49 ms | 78.03 ms | 0% |
+| Internet (8.8.8.8) | 34.75 ms | 65.75 ms | 147 ms | 0% |
+
+### Test Matrix Summary
+
+| # | Category | Test | Expected | Actual | Status |
+|---|----------|------|----------|--------|--------|
+| 1 | Infrastructure | K3s Status | Ready | Ready | ✅ PASS |
+| 2 | Infrastructure | Calico CNI | Running | Running | ✅ PASS |
+| 3 | Deployment | All Pods | 10 Running | 10 Running | ✅ PASS |
+| 4 | Deployment | Static IPs | Assigned | Assigned | ✅ PASS |
+| 5 | Deployment | MongoDB | Connected | Connected | ✅ PASS |
+| 6 | UERANSIM | gNB | NG Setup OK | Successful | ✅ PASS |
+| 7 | UERANSIM | UE Registration | MM-REGISTERED | Registered | ✅ PASS |
+| 8 | UERANSIM | PDU Session | Established | Established | ✅ PASS |
+| 9 | Connectivity | TUN Interface | Up with IP | 10.45.0.6/24 | ✅ PASS |
+| 10 | Connectivity | Gateway | 0% loss | 0% loss | ✅ PASS |
+| 11 | Connectivity | Internet | 0% loss | 0% loss | ✅ PASS |
+| 12 | Connectivity | DNS/HTTP | Working | Working | ✅ PASS |
+
+**Conclusion**: All 12 tests passed successfully (100% success rate). The deployment is fully functional and production-ready.
+
+---
+
+## 🚀 Quick Start Guide
+
+### Prerequisites Check
+
+```bash
+# Check Ubuntu version
+lsb_release -a
+
+# Check available resources
+free -h && df -h
+
+# Enable IP forwarding
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+### Step 1: System Preparation
+
+```bash
+# Update system
+sudo apt-get update && sudo apt-get upgrade -y
+
+# Install dependencies
+sudo apt-get install -y curl git iptables net-tools iputils-ping \
+    traceroute tcpdump libsctp1 lksctp-tools
+```
+
+### Step 2: Clone Repository
+
+```bash
+# Remove old repo if exists
+rm -rf ~/Open5GS-Testbed
+
+# Clone fresh copy
+git clone https://github.com/rayhanegar/Open5GS-Testbed.git
+cd Open5GS-Testbed/open5gs/open5gs-k3s-calico
+```
+
+### Step 3: Install K3s with Calico
+
+```bash
+# Make script executable and run
+chmod +x setup-k3s-environment-calico.sh
+sudo ./setup-k3s-environment-calico.sh
+
+# Verify installation
+kubectl get nodes  # Expected: STATUS = Ready
+kubectl get pods -n kube-system | grep calico  # Expected: Running
+```
+
+### Step 4: Build and Import Container Images
+
+```bash
+# Fix script permissions
+sed -i 's/docker build/sudo docker build/g' build-import-containers.sh
+sed -i 's/docker save/sudo docker save/g' build-import-containers.sh
+sed -i 's/k3s ctr/sudo k3s ctr/g' build-import-containers.sh
+
+# Build images (10-15 minutes)
+chmod +x build-import-containers.sh
+sudo ./build-import-containers.sh
+
+# Verify images
+sudo k3s crictl images | grep open5gs  # Expected: 10 images
+```
+
+### Step 5: Deploy Open5GS to K3s
+
+```bash
+# Deploy
+chmod +x deploy-k3s-calico.sh
+sudo ./deploy-k3s-calico.sh
+
+# Monitor deployment
+kubectl get pods -n open5gs -w  # Wait until all Running
+```
+
+### Step 6: Setup MongoDB External Endpoint
+
+```bash
+# Get host IP
+HOST_IP=$(hostname -I | awk '{print $1}')
+
+# Create MongoDB service
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: open5gs
+spec:
+  ports:
+  - port: 27017
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: mongodb
+  namespace: open5gs
+subsets:
+- addresses:
+  - ip: $HOST_IP
+  ports:
+  - port: 27017
+EOF
+
+# Restart PCF and UDR
+kubectl delete pod pcf-0 udr-0 -n open5gs
+```
+
+### Step 7: Configure UERANSIM
+
+```bash
+cd ~/Open5GS-Testbed/ueransim/configs
+
+# Get AMF IP and Host IP
+AMF_IP=$(kubectl get pod amf-0 -n open5gs -o jsonpath='{.status.podIP}')
+HOST_IP=$(hostname -I | awk '{print $1}')
+
+# Update gNB config
+sed -i "s/linkIp: .*/linkIp: $HOST_IP/" open5gs-gnb-k3s.yaml
+sed -i "s/ngapIp: .*/ngapIp: $HOST_IP/" open5gs-gnb-k3s.yaml
+sed -i "s/gtpIp: .*/gtpIp: $HOST_IP/" open5gs-gnb-k3s.yaml
+sed -i "s/address: .*/address: $AMF_IP/" open5gs-gnb-k3s.yaml
+
+# Update UE config
+sed -i "s/127.0.0.1/$HOST_IP/" open5gs-ue-embb.yaml
+sed -i 's/imsi-001011000000001/imsi-001010000000001/' open5gs-ue-embb.yaml
+```
+
+### Step 8: Run UERANSIM
+
+**Terminal 1 - Start gNB:**
+```bash
+cd ~/Open5GS-Testbed/ueransim
+nohup ./build/nr-gnb -c configs/open5gs-gnb-k3s.yaml > gnb.log 2>&1 &
+tail -f gnb.log  # Expected: "NG Setup procedure is successful"
+```
+
+**Terminal 2 - Start UE:**
+```bash
+cd ~/Open5GS-Testbed/ueransim
+sudo screen -dmS ue bash -c './build/nr-ue -c configs/open5gs-ue-embb.yaml > ue.log 2>&1'
+sleep 3
+tail -20 ue.log  # Expected: "TUN interface[uesimtun0, 10.45.0.X] is up"
+```
+
+### Step 9: Connectivity Tests
+
+```bash
+# Check TUN interface
+ip addr show uesimtun0
+
+# Test gateway
+sudo ping -I uesimtun0 -c 4 10.45.0.1
+
+# Test internet
+sudo ping -I uesimtun0 -c 4 8.8.8.8
+
+# Test DNS
+nslookup google.com 8.8.8.8
+
+# Test HTTP
+sudo wget --bind-address=10.45.0.6 -O /dev/null http://www.google.com
+```
+
+### Verification Commands
+
+```bash
+# Check all pods
+kubectl get pods -n open5gs
+
+# Check processes
+ps aux | grep nr-gnb | grep -v grep
+ps aux | grep nr-ue | grep -v grep
+
+# Monitor logs
+kubectl logs -n open5gs amf-0 -f
+```
+
+### Stop Services
+
+```bash
+# Stop UERANSIM
+sudo pkill -f nr-ue
+pkill -f nr-gnb
+
+# Stop Open5GS
+kubectl delete namespace open5gs
+
+# Uninstall K3s (optional)
+/usr/local/bin/k3s-uninstall.sh
+```
+
+---
+
 ## 🔧 Troubleshooting
 
 | Issue                    | Penyebab                 | Solusi                                    |
