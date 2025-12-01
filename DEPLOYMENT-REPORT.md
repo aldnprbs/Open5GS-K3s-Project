@@ -16,8 +16,8 @@ Deployment Open5GS 5G Core Network menggunakan Kubernetes (K3s) dengan Calico CN
 | Objective | Target | Actual | Status |
 |-----------|--------|--------|--------|
 | **Terminal 1: gNB Connection** | NG Setup successful | ✅ Achieved | **PASS** |
-| **Terminal 2: UE Registration** | TUN interface up | ✅ 10.45.0.3/24 | **PASS** |
-| **Terminal 3: Internet Access** | 0% packet loss | ✅ 0% loss | **PASS** |
+| **Terminal 2: UE Registration** | TUN interface up | ✅ 10.45.0.6/24 | **PASS** |
+| **Terminal 3: Internet Access** | 0% packet loss | ✅ 0% loss, 48.5ms avg | **PASS** |
 
 ---
 
@@ -103,7 +103,7 @@ Status: ✅ REGISTERED
 [nas] [info] UE switches to state [MM-REGISTERED/NORMAL-SERVICE]
 [nas] [info] PDU Session establishment is successful PSI[1]
 [app] [info] Connection setup for PDU session[1] is successful, 
-      TUN interface[uesimtun0, 10.45.0.3] is up.
+      TUN interface[uesimtun0, 10.45.0.6] is up.
 ```
 
 ---
@@ -113,7 +113,7 @@ Status: ✅ REGISTERED
 ### 1. TUN Interface Status
 ```
 Interface: uesimtun0
-IP Address: 10.45.0.3/24
+IP Address: 10.45.0.6/24
 Status: UP ✅
 MTU: 1400
 ```
@@ -175,7 +175,7 @@ Hop 5: 10.24.85.181 (ISP Core) - 30ms
 | **gNB → AMF** | NG Setup OK | ✅ Successful | **PASS** |
 | **UE Registration** | MM-REGISTERED | ✅ Registered | **PASS** |
 | **PDU Session** | Established | ✅ Established | **PASS** |
-| **TUN Interface** | Up with IP | ✅ 10.45.0.3/24 | **PASS** |
+| **TUN Interface** | Up with IP | ✅ 10.45.0.6/24 | **PASS** |
 | **Gateway Ping** | 0% loss | ✅ 0% loss | **PASS** |
 | **Internet Ping** | 0% loss | ✅ 0% loss | **PASS** |
 | **DNS Resolution** | Working | ✅ Working | **PASS** |
@@ -205,7 +205,7 @@ Hop 5: 10.24.85.181 (ISP Core) - 30ms
 
 ### 3. Network Architecture
 ```
-[UE (10.45.0.3)] 
+[UE (10.45.0.6)] 
     ↓ N1/N2
 [gNB (192.168.100.141)]
     ↓ N2 (SCTP/38412)
@@ -311,7 +311,7 @@ Hop 5: 10.24.85.181 (ISP Core) - 30ms
 Proyek deployment Open5GS pada K3s telah **berhasil 100%** dengan semua objective tercapai:
 
 ✅ **Terminal 1**: gNB successfully connected dengan "NG Setup procedure is successful"  
-✅ **Terminal 2**: UE registered dengan "TUN interface[uesimtun0, 10.45.0.3] is up"  
+✅ **Terminal 2**: UE registered dengan "TUN interface[uesimtun0, 10.45.0.6] is up"  
 ✅ **Terminal 3**: Internet connectivity dengan "0% packet loss" ke 8.8.8.8
 
 Semua 10 Network Functions berjalan stabil, konektivitas end-to-end terbukti berfungsi, dan sistem siap untuk testing lanjutan atau analisis protocol dengan Wireshark.

@@ -42,11 +42,11 @@ Screenshot berikut menampilkan **keberhasilan koneksi gNodeB ke AMF** melalui pr
 Screenshot berikut menampilkan **proses registrasi UE (User Equipment)** dan pembuatan sesi data:
 - `[nas] [info] Initial Registration is successful` → UE berhasil registrasi ke jaringan 5G
 - `[nas] [info] PDU Session establishment is successful PSI[1]` → Sesi data layer 3 terbentuk
-- `[app] [info] TUN interface[uesimtun1, 10.45.0.7] is up` → **Objective Terminal 2 TERCAPAI** ✅
+- `[app] [info] TUN interface[uesimtun0, 10.45.0.6] is up` → **Objective Terminal 2 TERCAPAI** ✅
 
 ![Terminal 2 — UE Registration](screenshots/terminal2-ue.png)
 
-**Penjelasan**: UE berhasil mendapatkan IP address `10.45.0.7/24` dari subnet eMBB (Enhanced Mobile Broadband) melalui SMF dan UPF. Interface virtual `uesimtun1` yang dibuat memungkinkan UE untuk berkomunikasi dengan internet melalui 5G Core Network.
+**Penjelasan**: UE berhasil mendapatkan IP address `10.45.0.6/24` dari subnet eMBB (Enhanced Mobile Broadband) melalui SMF dan UPF. Interface virtual `uesimtun0` yang dibuat memungkinkan UE untuk berkomunikasi dengan internet melalui 5G Core Network.
 
 ---
 
@@ -287,7 +287,7 @@ sudo ./build/nr-ue -c configs/open5gs-ue-embb.yaml
 
 | Test Category | Target | Actual Result | Status |
 |---------------|--------|---------------|--------|
-| **TUN Interface** | Up with IP | ✅ uesimtun0: 10.45.0.3/24 | **PASS** |
+| **TUN Interface** | Up with IP | ✅ uesimtun0: 10.45.0.6/24 | **PASS** |
 | **UPF Gateway Ping** | Reachable | ✅ 0% loss, RTT 25ms avg | **PASS** |
 | **Internet Ping (8.8.8.8)** | 0% loss | ✅ 0% loss, RTT 65ms avg | **PASS** |
 | **DNS Resolution** | Working | ✅ google.com resolved | **PASS** |

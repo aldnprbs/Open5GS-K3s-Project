@@ -144,17 +144,17 @@ ip addr show uesimtun0
 **Result**: ✅ **PASS**
 ```
 54: uesimtun0: <POINTOPOINT,PROMISC,NOTRAILERS,UP,LOWER_UP> mtu 1400
-    inet 10.45.0.3/24 scope global uesimtun0
+    inet 10.45.0.6/24 scope global uesimtun0
 ```
 
 ### Test 4.2: Gateway Connectivity (UE → UPF)
 ```bash
-sudo ping -I uesimtun0 -c 4 10.45.0.1
+ping -I uesimtun0 -c 4 10.45.0.1
 ```
-**Expected**: 0% packet loss  
+**Expected**: 0% packet loss, RTT ~25ms  
 **Result**: ✅ **PASS**
 ```
-PING 10.45.0.1 (10.45.0.1) from 10.45.0.3 uesimtun0: 56(84) bytes of data.
+PING 10.45.0.1 (10.45.0.1) from 10.45.0.6 uesimtun0: 56(84) bytes of data.
 64 bytes from 10.45.0.1: icmp_seq=1 ttl=64 time=10.6 ms
 64 bytes from 10.45.0.1: icmp_seq=2 ttl=64 time=4.11 ms
 64 bytes from 10.45.0.1: icmp_seq=3 ttl=64 time=9.20 ms
@@ -167,12 +167,12 @@ rtt min/avg/max/mdev = 4.111/25.492/78.028/30.428 ms
 
 ### Test 4.3: Internet Connectivity
 ```bash
-sudo ping -I uesimtun0 -c 4 8.8.8.8
+ping -I uesimtun0 -c 4 8.8.8.8
 ```
-**Expected**: 0% packet loss  
+**Expected**: 0% packet loss, RTT ~48ms  
 **Result**: ✅ **PASS**
 ```
-PING 8.8.8.8 (8.8.8.8) from 10.45.0.3 uesimtun0: 56(84) bytes of data.
+PING 8.8.8.8 (8.8.8.8) from 10.45.0.6 uesimtun0: 56(84) bytes of data.
 64 bytes from 8.8.8.8: icmp_seq=1 ttl=112 time=147 ms
 64 bytes from 8.8.8.8: icmp_seq=2 ttl=112 time=34.7 ms
 64 bytes from 8.8.8.8: icmp_seq=3 ttl=112 time=38.7 ms
@@ -218,7 +218,7 @@ traceroute to 8.8.8.8 (8.8.8.8), 5 hops max, 60 byte packets
 
 ### Test 4.6: HTTP Download
 ```bash
-sudo wget --bind-address=10.45.0.3 -O /dev/null -T 10 http://www.google.com
+sudo wget --bind-address=10.45.0.6 -O /dev/null -T 10 http://www.google.com
 ```
 **Expected**: Successful download  
 **Result**: ✅ **PASS**
@@ -270,7 +270,7 @@ Connecting to www.google.com (www.google.com)|142.251.12.105|:80... connected.
 | 6 | UERANSIM | gNB Registration | NG Setup OK | Successful | ✅ PASS |
 | 7 | UERANSIM | UE Registration | MM-REGISTERED | Registered | ✅ PASS |
 | 8 | UERANSIM | PDU Session | Established | Established | ✅ PASS |
-| 9 | Connectivity | TUN Interface | Up with IP | 10.45.0.3/24 | ✅ PASS |
+| 9 | Connectivity | TUN Interface | Up with IP | 10.45.0.6/24 | ✅ PASS |
 | 10 | Connectivity | Gateway Ping | 0% loss | 0% loss | ✅ PASS |
 | 11 | Connectivity | Internet Ping | 0% loss | 0% loss | ✅ PASS |
 | 12 | Connectivity | DNS/HTTP | Working | Working | ✅ PASS |

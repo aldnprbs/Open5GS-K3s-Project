@@ -258,7 +258,7 @@ nslookup google.com 8.8.8.8
 ### Test HTTP
 
 ```bash
-sudo wget --bind-address=10.45.0.3 -O /dev/null http://www.google.com
+sudo wget --bind-address=10.45.0.6 -O /dev/null http://www.google.com
 # Expected: Download successful
 ```
 
