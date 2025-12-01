@@ -52,37 +52,40 @@ Screenshot berikut menampilkan **proses registrasi UE (User Equipment)** dan pem
 
 ### 🌐 Terminal 3 — Connectivity Tests (End-to-End Verification)
 
-Screenshot berikut menampilkan **3 kategori tes konektivitas** untuk memvalidasi bahwa UE dapat mengakses internet melalui jaringan 5G:
+Screenshot berikut menampilkan **4 kategori tes konektivitas** yang dijalankan secara berurutan untuk memvalidasi bahwa UE dapat mengakses internet melalui jaringan 5G:
 
-#### Screenshot 3.1 — TUN Interface & Gateway Ping
-- TUN interface `uesimtun1` dengan IP `10.45.0.7` aktif
-- Gateway UPF (`10.45.0.1`) dapat di-ping dengan **0% packet loss**, RTT avg ~25ms
+#### Screenshot 3.1 — TUN Interface & Gateway Ping (TEST 1 & 2)
+- **[TEST 1]** TUN Interface Status: `uesimtun0` dengan IP `10.45.0.6/24` aktif ✅
+- **[TEST 2]** Gateway Ping ke UPF `10.45.0.1`: **0% packet loss**, RTT avg **25.911 ms**
+- 4 paket dikirim, 4 paket diterima (100% success)
 
 ![Terminal 3.1 — TUN & Gateway](screenshots/terminal3-tests-1.png)
 
-**Penjelasan**: Tes ini memverifikasi layer 3 connectivity antara UE dan UPF (User Plane Function). RTT 25ms menunjukkan latensi loopback yang sangat baik.
+**Penjelasan**: Tes ini memverifikasi **layer 3 connectivity** antara UE dan UPF (User Plane Function). Interface `uesimtun0` adalah virtual network interface yang dibuat oleh UERANSIM untuk meneruskan traffic dari UE ke 5G Core Network. RTT 25.911ms menunjukkan latensi yang sangat baik untuk komunikasi lokal antara UE dan UPF.
 
 ---
 
-#### Screenshot 3.2 — Internet Connectivity & DNS
-- Ping ke `8.8.8.8` (Google DNS) berhasil dengan **0% packet loss** → **Objective Terminal 3 TERCAPAI** ✅
-- RTT average ~65ms (normal untuk internet publik)
-- DNS resolution `google.com` → `142.250.x.x` berhasil
+#### Screenshot 3.2 — Internet Connectivity & DNS Resolution (TEST 3 & 4)
+- **[TEST 3]** Internet Ping ke `8.8.8.8` (Google Public DNS): **0% packet loss** → **Objective Terminal 3 TERCAPAI** ✅
+- RTT average **48.508 ms** (normal untuk akses internet publik)
+- 4 paket dikirim, 4 paket diterima (100% success)
+- **[TEST 4]** DNS Resolution `google.com`: Berhasil resolve ke multiple IP addresses
+  - IPv4: `172.217.194.113`, `172.217.194.101`, `172.217.194.139`, `172.217.194.100`, `172.217.194.138`, `172.217.194.102`
+  - IPv6: `2404:6800:4003:c01::8b`, `2404:6800:4003:c01::64`, `2404:6800:4003:c01::8a`, `2404:6800:4003:c01::71`
 
 ![Terminal 3.2 — Internet & DNS](screenshots/terminal3-tests-2.png)
 
-**Penjelasan**: UE berhasil mengakses internet publik melalui 5G Core. Paket data melewati jalur: **UE → gNB → AMF → SMF → UPF → Internet Gateway → 8.8.8.8**. DNS resolution juga bekerja sempurna.
+**Penjelasan**: UE berhasil mengakses **internet publik** melalui 5G Core Network. Paket data melewati jalur lengkap: **UE (10.45.0.6) → gNB (192.168.100.141) → AMF → SMF → UPF (10.45.0.1) → Internet Gateway → 8.8.8.8**. DNS resolution juga bekerja sempurna, membuktikan bahwa UE dapat melakukan query DNS melalui server `8.8.8.8` dan mendapatkan response dengan IP address google.com.
 
 ---
 
-#### Screenshot 3.3 — HTTP Download & Traceroute
-- HTTP download dari `http://ipv4.download.thinkbroadband.com/5MB.zip` berhasil
-- Download speed: **416 KB/s** (throughput stabil)
-- Traceroute menunjukkan path: `10.45.0.7 (UE) → 10.45.0.1 (UPF) → 192.168.100.1 (Gateway) → ISP`
+#### Screenshot 3.3 — All Tests Complete
+- Status: **=== ALL TESTS COMPLETE ===** ✅
+- Semua 4 tes konektivitas berhasil dilakukan tanpa error
 
-![Terminal 3.3 — HTTP & Traceroute](screenshots/terminal3-tests-3.png)
+![Terminal 3.3 — All Tests Complete](screenshots/terminal3-tests-3.png)
 
-**Penjelasan**: Tes HTTP download memverifikasi bahwa UE dapat melakukan transfer data real-world (bukan hanya ICMP ping). Traceroute mengkonfirmasi routing path yang benar dari UE hingga ke internet publik.
+**Penjelasan**: Screenshot ini mengkonfirmasi bahwa **seluruh rangkaian tes telah selesai** dijalankan dengan sukses. Tidak ada error atau packet loss yang terjadi, membuktikan bahwa deployment Open5GS + UERANSIM berfungsi dengan sempurna untuk menyediakan konektivitas end-to-end dari UE hingga internet publik melalui 5G Core Network.
 
 ---
 
@@ -94,8 +97,8 @@ Screenshot berikut menampilkan **3 kategori tes konektivitas** untuk memvalidasi
 | Objective | Target | Result | Status |
 |-----------|--------|--------|--------|
 | **Terminal 1: gNB Connection** | NG Setup successful | ✅ Achieved | **PASS** |
-| **Terminal 2: UE Registration** | TUN interface up | ✅ 10.45.0.3/24 | **PASS** |
-| **Terminal 3: Internet Access** | 0% packet loss | ✅ 0% loss, 65ms avg | **PASS** |
+| **Terminal 2: UE Registration** | TUN interface up | ✅ 10.45.0.6/24 | **PASS** |
+| **Terminal 3: Internet Access** | 0% packet loss | ✅ 0% loss, 48.5ms avg | **PASS** |
 
 **Test Results**: 12/12 tests passed (100% success rate)
 
