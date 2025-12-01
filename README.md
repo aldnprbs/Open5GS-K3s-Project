@@ -15,11 +15,74 @@
 
 ## 👥 Anggota Kelompok
 
-| No | Nama                          | NIM             |
-| -: | ----------------------------- | --------------- |
-|  1 | **Muhammad Alden Prabaswara** | 235150201111014 |
-|  2 | **Hanidura Ayatulloh**        | 225150207111005 |
-|  3 | **Ni Nyoman Chandra P. I. W** | 225150207111106 |
+| No | Nama                          | NIM             | Role                        |
+| -: | ----------------------------- | --------------- | --------------------------- |
+|  1 | **Muhammad Alden Prabaswara** | 235150201111014 | K3s & Infrastructure Setup  |
+|  2 | **Hanidura Ayatulloh**        | 225150207111005 | Open5GS Core Deployment     |
+|  3 | **Ni Nyoman Chandra P. I. W** | 225150207111106 | UERANSIM Testing & Validation |
+
+---
+
+## 📸 Screenshot Hasil Deployment
+
+### 📡 Terminal 1 — gNB Connection (NG Setup Successful)
+
+Screenshot berikut menampilkan **keberhasilan koneksi gNodeB ke AMF** melalui protokol NGAP. Pesan penting yang ditampilkan:
+- `[sctp] [info] SCTP connection established (10.10.0.5:38412)` → Koneksi SCTP ke AMF berhasil
+- `[ngap] [info] NG Setup procedure is successful` → **Objective Terminal 1 TERCAPAI** ✅
+
+![Terminal 1 — gNB Connection](screenshots/terminal1-gnb.png)
+
+**Penjelasan**: gNodeB simulator berhasil melakukan handshake dengan AMF (Access and Mobility Management Function) yang berjalan di pod K3s dengan IP 10.10.0.5. Ini membuktikan bahwa **Radio Access Network (RAN) berhasil terhubung ke 5G Core Network**.
+
+---
+
+### 📱 Terminal 2 — UE Registration (TUN Interface Up)
+
+Screenshot berikut menampilkan **proses registrasi UE (User Equipment)** dan pembuatan sesi data:
+- `[nas] [info] Initial Registration is successful` → UE berhasil registrasi ke jaringan 5G
+- `[nas] [info] PDU Session establishment is successful PSI[1]` → Sesi data layer 3 terbentuk
+- `[app] [info] TUN interface[uesimtun1, 10.45.0.7] is up` → **Objective Terminal 2 TERCAPAI** ✅
+
+![Terminal 2 — UE Registration](screenshots/terminal2-ue.png)
+
+**Penjelasan**: UE berhasil mendapatkan IP address `10.45.0.7/24` dari subnet eMBB (Enhanced Mobile Broadband) melalui SMF dan UPF. Interface virtual `uesimtun1` yang dibuat memungkinkan UE untuk berkomunikasi dengan internet melalui 5G Core Network.
+
+---
+
+### 🌐 Terminal 3 — Connectivity Tests (End-to-End Verification)
+
+Screenshot berikut menampilkan **3 kategori tes konektivitas** untuk memvalidasi bahwa UE dapat mengakses internet melalui jaringan 5G:
+
+#### Screenshot 3.1 — TUN Interface & Gateway Ping
+- TUN interface `uesimtun1` dengan IP `10.45.0.7` aktif
+- Gateway UPF (`10.45.0.1`) dapat di-ping dengan **0% packet loss**, RTT avg ~25ms
+
+![Terminal 3.1 — TUN & Gateway](screenshots/terminal3-tests-1.png)
+
+**Penjelasan**: Tes ini memverifikasi layer 3 connectivity antara UE dan UPF (User Plane Function). RTT 25ms menunjukkan latensi loopback yang sangat baik.
+
+---
+
+#### Screenshot 3.2 — Internet Connectivity & DNS
+- Ping ke `8.8.8.8` (Google DNS) berhasil dengan **0% packet loss** → **Objective Terminal 3 TERCAPAI** ✅
+- RTT average ~65ms (normal untuk internet publik)
+- DNS resolution `google.com` → `142.250.x.x` berhasil
+
+![Terminal 3.2 — Internet & DNS](screenshots/terminal3-tests-2.png)
+
+**Penjelasan**: UE berhasil mengakses internet publik melalui 5G Core. Paket data melewati jalur: **UE → gNB → AMF → SMF → UPF → Internet Gateway → 8.8.8.8**. DNS resolution juga bekerja sempurna.
+
+---
+
+#### Screenshot 3.3 — HTTP Download & Traceroute
+- HTTP download dari `http://ipv4.download.thinkbroadband.com/5MB.zip` berhasil
+- Download speed: **416 KB/s** (throughput stabil)
+- Traceroute menunjukkan path: `10.45.0.7 (UE) → 10.45.0.1 (UPF) → 192.168.100.1 (Gateway) → ISP`
+
+![Terminal 3.3 — HTTP & Traceroute](screenshots/terminal3-tests-3.png)
+
+**Penjelasan**: Tes HTTP download memverifikasi bahwa UE dapat melakukan transfer data real-world (bukan hanya ICMP ping). Traceroute mengkonfirmasi routing path yang benar dari UE hingga ke internet publik.
 
 ---
 
@@ -214,33 +277,6 @@ sudo ./build/nr-ue -c configs/open5gs-ue-embb.yaml
 ```
 
 ---
-
-# 🖥️ Hasil Eksekusi (Untuk Screenshot / Log)
-
-Bagian berikut **disiapkan kosong** agar kamu bisa menaruh **SS Terminal 1, 2, dan 3** langsung di README repo GitHub.
-
----
-
-## 📌 Terminal 1 — gNB (nr-gnb)
-
-![Terminal 1 — gNB](assets/terminal1-gnb.png)
-
----
-
-## 📌 Terminal 2 — UE (nr-ue)
-
-![Terminal 2 — UE](assets/terminal2-ue.png)
-
----
-
-## 📌 Terminal 3 — Monitoring / K3s / Logs Tambahan
-
-![Terminal 3 — Monitoring 1](assets/terminal3-monitoring-1.png)
-
-![Terminal 3 — Monitoring 2](assets/terminal3-monitoring-2.png)
-
-![Terminal 3 — Monitoring 3](assets/terminal3-monitoring-3.png)
-
 
 ## 📊 Actual Performance Results
 
